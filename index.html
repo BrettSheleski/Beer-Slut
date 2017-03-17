@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+    <title>Beer Slut</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <script type="text/javascript" src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
+    <script type="text/javascript" src="BeerSlut.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+            background-color: black;
+            /*background-image: url('images/bg.jpg');
+            background-size:cover;
+            background-repeat: no-repeat;*/
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        #bsContainer {
+            position: relative;
+            display: block;
+            height: 0;
+            padding: 0;
+            overflow: hidden;
+            padding-bottom: 56.25%;
+        }
+
+        #bsContainer canvas {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+    </style>
+</head>
+<body style="margin: 0;">
+    <div id="bsContainer">
+        <canvas id="bs" width="1920" height="1080"  />
+        <script type="text/javascript">
+            (function () {
+                var canvas = document.getElementById("bs");
+
+                var options = {
+                    'fps': 60
+                };
+
+                var bs = new BeerSlut(canvas, options);
+
+                bs.start();
+            })();
+        </script>
+
+    </div>
+    
+</body>
+</html>
