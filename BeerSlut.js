@@ -96,8 +96,6 @@ BeerSlut = (function (createjs) {
 
     function createIntroPage(bs) {
         var container = new createjs.Container();
-
-        var snd = createjs.Sound.play("assets/intro/intro.mp3");
        
         var center = bs.getCenter();
 
