@@ -68,6 +68,11 @@ BeerSlut = (function (createjs) {
     };
 
     BeerSlut.prototype.start = function () {
+
+        this.showPage(createGameBoardPage(this));
+
+        /*
+
         this.loadAssets();
 
         var bs = this;
@@ -82,6 +87,7 @@ BeerSlut = (function (createjs) {
         introPage.createContent = createIntroPage;
 
         introPage.start();
+        */
     };
 
     BeerSlut.prototype.getCenter = function () {
@@ -341,6 +347,157 @@ BeerSlut = (function (createjs) {
     function createGameBoardPage(bs) {
         var container = new createjs.Container();
 
+        var bg = new createjs.Shape();
+        bg.graphics.beginFill("#3399ff").drawRect(0, 0, bs.getWidthPercent(100), bs.getHeightPercent(100));
+
+        var overlay = new createjs.Shape();
+        overlay.graphics.beginFill("black").drawRect(0, 0, bs.getWidthPercent(100), bs.getHeightPercent(100));
+        overlay.alpha = 0;
+
+        var cardContainer = new createjs.Container().set({
+            x: bs.getWidthPercent(5),
+            y: bs.getHeightPercent(5)
+        });
+
+        container.addChild(bg, cardContainer);
+
+        var isClickEnabled = true;
+
+        var rows = 5,
+            columns = 11,
+            cardMargin = bs.getWidthPercent(1),
+            cardHeight = bs.getHeightPercent(85) / rows,
+            cardWidth = bs.getWidthPercent(90) / columns;
+
+        function onCardMouseOver(evt) {
+            createjs.Tween.get(evt.currentTarget).to({ scaleX: 1.25, scaleY: 1.25, alpha: 1 }, fadeTime);
+        }
+
+        function onCardMouseOut(evt) {
+            createjs.Tween.get(evt.currentTarget, { override: true }).to({ scaleX: 1, scaleY: 1, alpha: .9 }, fadeTime / 2);
+        }
+
+        function onCardClick(evt) {
+            if (evt.currentTarget.isEnabled && isClickEnabled) {
+                evt.currentTarget.isEnabled = false;
+                isClickEnabled = false;
+                createjs.Tween.get(overlay, { override: true })
+                    .to({ alpha: .9 }, fadeTime)
+                    .call(function () {
+
+                        var start = bs.getCenter();
+                        var end = bs.getCenter();
+
+                        var r = Math.floor(Math.random() * 4) % 4;
+
+                        switch (r) {
+                            case 0: // left
+                                start.x -= bs.getWidthPercent(100);
+                                break;
+                            case 1: // top
+                                start.y -= bs.getHeightPercent(100);
+                                break;
+                            case 2: // right
+                                start.x += bs.getWidthPercent(100);
+                                break;
+                            case 3: // bottom
+                                start.y += bs.getHeightPercent(100);
+                                break;
+                        }
+
+                        r = Math.floor(Math.random() * 4) % 4;
+
+                        switch (r) {
+                            case 0: // left
+                                end.x -= bs.getWidthPercent(100);
+                                break;
+                            case 1: // top
+                                end.y -= bs.getHeightPercent(100);
+                                break;
+                            case 2: // right
+                                end.x += bs.getWidthPercent(100);
+                                break;
+                            case 3: // bottom
+                                end.y += bs.getHeightPercent(100);
+                                break;
+                        }
+
+
+
+
+                        var text = new createjs.Text("Drink!", "bold 112px Arial", "red")
+                            .set({
+                                textAlign: "center",
+                                textBaseline: "middle"
+                            })
+                            .set(start);
+
+                        container.addChild(text);
+
+                        createjs.Tween.get(text)
+                            .to(bs.getCenter(), 1000, createjs.Ease.bounceOut)
+                            .wait(1000)
+                            .to(end, 1000, createjs.Ease.backIn)
+                            .call(function () {
+
+                                container.removeChild(text);
+
+                                createjs.Tween.get(overlay, { override: true })
+                                    .to({ alpha: 0 }, fadeTime / 2)
+                                    .call(function () {
+                                        isClickEnabled = true;
+
+                                        createjs.Tween.get(evt.currentTarget).to({ alpha: 0.5 }, fadeTime * 2);
+
+                                        evt.currentTarget.cursor = "not-allowed";
+                                        evt.currentTarget.removeAllEventListeners();
+                                        
+                                    })
+                            })
+
+
+                    });
+            }
+
+        }
+
+        for (var i = 0; i < rows; ++i) {
+            for (var j = 0; j < columns; ++j) {
+                var card = new createjs.Container();
+                card.regX = (cardWidth - cardMargin) / 2;
+                card.regY = (cardHeight - cardMargin) / 2;
+                card.x = j * cardWidth + card.regX;
+                card.y = i * cardHeight + card.regY;
+                card.alpha = 0.9;
+                card.cursor = "pointer";
+                card.isEnabled = true;
+
+                var cardShape = createCardShape(cardWidth - cardMargin, cardHeight - cardMargin);
+                card.addChild(cardShape);
+
+                card.on("mouseover", onCardMouseOver);
+                card.on("mouseout", onCardMouseOut);
+                card.on("click", onCardClick);
+
+                cardContainer.addChild(card);
+            }
+        }
+
+
+
+        var turnText = new createjs.Text("Player 1, you are up!")
+            .set({
+                x: bs.getWidthPercent(5),
+                y: bs.getHeightPercent(95),
+                textBaseline: "middle",
+                color: "white",
+                font: "bold 86px Arial"
+            });
+
+        container.addChild(turnText, overlay);
+
+
+
         return container;
     }
 
@@ -393,7 +550,7 @@ BeerSlut = (function (createjs) {
             card.on("click", function (evt) {
                 bs.numberOfPlayers = evt.currentTarget.numberOfPlayers;
 
-                bs.showPage(createGameBoardPage());
+                bs.showPage(createGameBoardPage(bs));
             });
 
             container.addChild(card);
