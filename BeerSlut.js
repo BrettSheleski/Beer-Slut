@@ -68,11 +68,7 @@ BeerSlut = (function (createjs) {
     };
 
     BeerSlut.prototype.start = function () {
-
-        this.showPage(createGameBoardPage(this));
-
-        /*
-
+        
         this.loadAssets();
 
         var bs = this;
@@ -87,7 +83,7 @@ BeerSlut = (function (createjs) {
         introPage.createContent = createIntroPage;
 
         introPage.start();
-        */
+        
     };
 
     BeerSlut.prototype.getCenter = function () {
@@ -454,8 +450,6 @@ BeerSlut = (function (createjs) {
                                         
                                     })
                             })
-
-
                     });
             }
 
