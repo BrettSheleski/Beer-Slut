@@ -1,8 +1,7 @@
 /// <reference path="createjs-2015.11.26.min.js" />
 
 BeerSlut = (function (createjs) {
-    //createjs.Sound.alternateExtensions = ["mp3"];
-    //createjs.Sound.registerPlugins([createjs.WebAudioPlugin]);
+
 
     var fadeTime = 250;
 
@@ -17,6 +16,7 @@ BeerSlut = (function (createjs) {
         this.stage = new createjs.Stage(canvas);
         this.stage.enableMouseOver();
         this.numberOfPlayers = 1;
+        this.currentPlayerIndex = 0;
 
         this.currentPage = null;
 
@@ -32,6 +32,10 @@ BeerSlut = (function (createjs) {
             self.stage.update();
         });
     }
+
+    BeerSlut.prototype.incrementCurrentPlayerIndex = function () {
+        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.numberOfPlayers;
+    };
 
     BeerSlut.prototype.loadAssets = function (callback) {
 
@@ -68,7 +72,7 @@ BeerSlut = (function (createjs) {
     };
 
     BeerSlut.prototype.start = function () {
-        
+
         this.loadAssets();
 
         var bs = this;
@@ -77,13 +81,14 @@ BeerSlut = (function (createjs) {
             { id: "intro", src: "assets/intro/intro.mp3" },
             { id: "introsong", src: "assets/introsong/song.mp3" },
             { id: "introsong.bg", src: "assets/introsong/bg.jpg" },
-            { id: "wench", src: "assets/introsong/wench.png" }
+            { id: "wench", src: "assets/introsong/wench.png" },
+            { id: "bg", src: "assets/introsong/bg.jpg" }
         ]);
 
         introPage.createContent = createIntroPage;
 
         introPage.start();
-        
+
     };
 
     BeerSlut.prototype.getCenter = function () {
@@ -378,7 +383,7 @@ BeerSlut = (function (createjs) {
                 evt.currentTarget.isEnabled = false;
                 isClickEnabled = false;
                 createjs.Tween.get(overlay, { override: true })
-                    .to({ alpha: .9 }, fadeTime)
+                    .to({ alpha: 0.75 }, fadeTime)
                     .call(function () {
 
                         var start = bs.getCenter();
@@ -438,6 +443,8 @@ BeerSlut = (function (createjs) {
 
                                 container.removeChild(text);
 
+                                bs.incrementCurrentPlayerIndex();
+
                                 createjs.Tween.get(overlay, { override: true })
                                     .to({ alpha: 0 }, fadeTime / 2)
                                     .call(function () {
@@ -447,9 +454,17 @@ BeerSlut = (function (createjs) {
 
                                         evt.currentTarget.cursor = "not-allowed";
                                         evt.currentTarget.removeAllEventListeners();
-                                        
-                                    })
-                            })
+
+
+
+                                        createjs.Tween.get(turnText)
+                                            .to({ scaleX: 1.1, scaleY: 1.1 }, fadeTime)
+                                            .call(function () {
+                                                turnText.text = "Player " + (bs.currentPlayerIndex + 1) + ", you're up!";
+                                            })
+                                            .to({ scaleX: 1, scaleY: 1 }, fadeTime / 2);
+                                    });
+                            });
                     });
             }
 
@@ -462,9 +477,11 @@ BeerSlut = (function (createjs) {
                 card.regY = (cardHeight - cardMargin) / 2;
                 card.x = j * cardWidth + card.regX;
                 card.y = i * cardHeight + card.regY;
-                card.alpha = 0.9;
+                card.alpha = 0;
                 card.cursor = "pointer";
-                card.isEnabled = true;
+                card.isEnabled = false;
+
+                createjs.Tween.get(card).wait(200 + Math.random() * 1000).to({ alpha: 0.9, isEnabled: true }, fadeTime);
 
                 var cardShape = createCardShape(cardWidth - cardMargin, cardHeight - cardMargin);
                 card.addChild(cardShape);
@@ -519,10 +536,9 @@ BeerSlut = (function (createjs) {
                 .set({
                     x: bs.getWidthPercent(15) + i * bs.getWidthPercent(10),
                     y: bs.getHeightPercent(40),
-                    cursor: "pointer"
+                    cursor: "pointer",
+                    numberOfPlayers: i
                 });
-
-            var numberOfPlayers = i;
 
             var shape = createCardShape(110, 150);
             shape.x = -55;
@@ -614,7 +630,7 @@ BeerSlut = (function (createjs) {
 
         innerBar.scaleX = 0;
 
-        this.addChild(text, outerBar, innerBar);
+        this.addChild(text, innerBar, outerBar);
 
 
 
