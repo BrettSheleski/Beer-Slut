@@ -1,17 +1,12 @@
 /// <reference path="createjs-2015.11.26.min.js" />
 
 BeerSlut = (function (createjs) {
+    //createjs.Sound.alternateExtensions = ["mp3"];
+    //createjs.Sound.registerPlugins([createjs.WebAudioPlugin]);
 
     var fadeTime = 250;
 
     var textShadow = new createjs.Shadow("black", 5, 5, 10);
-
-    var assetManifest = [
-        { src: "assets/introsong/bg.jpg", id: "introsong.bg", type: createjs.AbstractLoader.IMAGE }
-    ];
-
-    var assetLoader = new createjs.LoadQueue(true);
-
 
     function BeerSlut(canvas, options) {
         var self = this;
@@ -75,7 +70,18 @@ BeerSlut = (function (createjs) {
     BeerSlut.prototype.start = function () {
         this.loadAssets();
 
-        this.showPage(createIntroPage(this));
+        var bs = this;
+
+        var introPage = new Page(this, [
+            { id: "intro", src: "assets/intro/intro.mp3" },
+            { id: "introsong", src: "assets/introsong/song.mp3" },
+            { id: "introsong.bg", src: "assets/introsong/bg.jpg" },
+            { id: "wench", src: "assets/introsong/wench.png" }
+        ]);
+
+        introPage.createContent = createIntroPage;
+
+        introPage.start();
     };
 
     BeerSlut.prototype.getCenter = function () {
@@ -93,18 +99,19 @@ BeerSlut = (function (createjs) {
         return this.stage.canvas.width * p / 100;
     };
 
-
-    function createIntroPage(bs) {
+    function createIntroPage(bs, assets) {
         var container = new createjs.Container();
-       
+
         var center = bs.getCenter();
+
+
 
         var textOptions = {
             x: center.x,
             y: center.y - 100,
             textAlign: "center",
             textBaseline: "middle",
-            font: "86px Arial Black",
+            font: "bold 86px Arial",
             color: "red",
             lineWidth: 800,
             alpha: 0
@@ -116,46 +123,49 @@ BeerSlut = (function (createjs) {
 
         var punchText = new createjs.Text("Or I'll punch you in the face!!!".toUpperCase()).set(textOptions)
             .set({
-                font: "72px Arial Black",
+                font: "bold 72px Arial",
                 lineWidth: null,
                 y: fetchText.y + 300
             });
 
         container.addChild(thirstyText, fetchText, punchText);
 
-
-
         createjs.Tween.get(thirstyText)
             .to({ alpha: 1 }, fadeTime)
-            .wait(3000)
+            .wait(2000 - fadeTime)
             .to({ alpha: 0 }, fadeTime)
-            .call(function () {
-                createjs.Tween.get(fetchText)
-                    .to({ alpha: 1 }, fadeTime)
-                    .wait(1000)
-                    .call(function () {
-                        createjs.Tween.get(punchText)
-                            .to({ alpha: 1 }, fadeTime)
-                            .wait(1000)
-                            .call(function () {
-                                bs.showPage(createIntroSongPage(bs));
-                            });
-                    });
-            });
+            ;
+
+        createjs.Tween.get(fetchText)
+            .wait(2000)
+            .to({ alpha: 1, fadeTime })
+            ;
+
+        createjs.Tween.get(punchText)
+            .wait(3400 - fadeTime)
+            .to({ alpha: 1 }, fadeTime / 2)
+            ;
+
+        createjs.Sound.play("intro").on("complete", function () {
+            bs.showPage(createIntroSongPage(bs, assets));
+        });
 
 
         return container;
     }
 
-    function createIntroSongPage(bs) {
+    function createIntroSongPage(bs, assets) {
         var container = new createjs.Container();
 
         var bg = new createjs.Bitmap("assets/introsong/bg.jpg");
 
+        var song = createjs.Sound.play("introsong");
+
+
         var textOptions = {
             text: "BEER SLUT",
             color: "red",
-            font: "72px Arial Black",
+            font: "bold 72px Arial",
             shadow: textShadow,
             alpha: 0,
             textAlign: "center",
@@ -165,33 +175,51 @@ BeerSlut = (function (createjs) {
         var bs1 = new createjs.Text(textOptions.text).set(textOptions).set({ x: bs.getWidthPercent(25), y: bs.getHeightPercent(25), rotation: -15 });
         var bs2 = new createjs.Text(textOptions.text).set(textOptions).set({ x: bs.getWidthPercent(80), y: bs.getHeightPercent(50), rotation: 30 });
         var bs3 = new createjs.Text(textOptions.text).set(textOptions).set({ x: bs.getWidthPercent(20), y: bs.getHeightPercent(75), rotation: 15 });
-        var bs4 = new createjs.Text(textOptions.text).set(textOptions).set({ x: bs.getWidthPercent(50), y: bs.getHeightPercent(50), rotation: -20, font: "112px Arial Black" });
+        var bs4 = new createjs.Text(textOptions.text).set(textOptions).set({ x: bs.getWidthPercent(50), y: bs.getHeightPercent(50), rotation: -20, font: "bold 112px Arial" });
 
-        var wench = new createjs.Bitmap("assets/introsong/wench.jpg").set({ alpha: 0 });
+        var wench = new createjs.Bitmap(assets.getResult("wench"))
+            .set({
+                x: bs.getWidthPercent(30),
+                y: bs.getHeightPercent(100),
+                alpha: 0,
+                regX: 165,
+                regY: 482
+            });
 
         createjs.Tween.get(bs1)
             .wait(250)
-            .to({ alpha: 1 }, fadeTime);
+            .to({ alpha: 1 }, fadeTime)
+            .wait(7000 - 250)
+            .to({ alpha: 0.75 }, fadeTime * 2);
 
         createjs.Tween.get(bs2)
             .wait(1250)
-            .to({ alpha: 1 }, fadeTime);
+            .to({ alpha: 1 }, fadeTime)
+            .wait(7000 - 1250)
+            .to({ alpha: 0.75 }, fadeTime * 2);
 
         createjs.Tween.get(bs3)
             .wait(2250)
-            .to({ alpha: 1 }, fadeTime);
+            .to({ alpha: 1 }, fadeTime)
+            .wait(7000 - 2250)
+            .to({ alpha: 0.75 }, fadeTime * 2);
 
+        createjs.Tween.get(wench)
+            .wait(7200)
+            .to({ alpha: 1 }, fadeTime * 4);
 
         createjs.Tween.get(bs4)
-            .wait(4000)
+            .wait(3500)
             .to({ alpha: 1, scaleX: 1.5, scaleY: 1.5 }, fadeTime)
-            .wait(2000)
-            .call(function () {
-                bs.showPage(createInstructionPage(bs));
-            });
+            .wait(3700)
+            .to({ alpha: 1, scaleX: 2, scaleY: 2, rotation: bs4.rotation + 15 }, fadeTime, createjs.Ease.bounceInOut)
+            ;
 
+        song.on("complete", function () {
+            bs.showPage(createInstructionPage(bs));
+        });
 
-        container.addChild(bg, bs1, bs2, bs3, bs4, wench);
+        container.addChild(bg, bs1, bs2, bs3, wench, bs4);
 
         return container;
     }
@@ -204,7 +232,7 @@ BeerSlut = (function (createjs) {
 
         var textOptions = {
             color: "white",
-            font: "40px Comic Sans MS",
+            font: "40px Comic Sans MS, Comic Sans",
             x: bs.getWidthPercent(5),
             lineWidth: bs.getWidthPercent(90)
         };
@@ -326,10 +354,10 @@ BeerSlut = (function (createjs) {
 
         var textOptions = {
             textAlign: "center",
-            font: "86px Arial Black",
+            font: "bold 86px Arial",
             color: "white",
             shadow: textShadow
-        }
+        };
 
         var text = new createjs.Text("How Many Players?".toUpperCase()).set(textOptions).set({ x: bs.getWidthPercent(50), y: bs.getHeightPercent(25) });
 
@@ -370,7 +398,7 @@ BeerSlut = (function (createjs) {
 
             container.addChild(card);
         }
-        
+
         return container;
     }
 
@@ -389,6 +417,95 @@ BeerSlut = (function (createjs) {
 
         return shape;
     }
+
+    function LoadingScreen(page) {
+        this.Container_constructor();
+        this.page = page;
+
+        var bs = page.game;
+
+        var text = new createjs.Text("Loading...");
+        text.x = bs.getWidthPercent(50);
+        text.y = bs.getHeightPercent(45);
+        text.font = "bold 86px Arial";
+        text.color = "white";
+        text.textAlign = "center";
+        text.textBaseline = "middle";
+
+        var top = bs.getHeightPercent(92),
+            bottom = bs.getHeightPercent(97),
+            left = bs.getWidthPercent(20),
+            right = bs.getWidthPercent(80),
+            width = right - left,
+            height = top - bottom;
+
+        var outerBar = new createjs.Shape();
+        outerBar.graphics
+            .setStrokeStyle(5)
+            .beginStroke("white")
+            .moveTo(left, top)
+            .lineTo(right, top)
+            .lineTo(right, bottom)
+            .lineTo(left, bottom)
+            .closePath();
+
+
+        var innerBar = new createjs.Shape()
+            .set({ x: left, y: bottom });
+
+        innerBar.graphics
+            .beginFill("red")
+            .moveTo(0, 0)
+            .lineTo(width, 0)
+            .lineTo(width, height)
+            .lineTo(0, height)
+            .closePath();
+
+        innerBar.scaleX = 0;
+
+        this.addChild(text, outerBar, innerBar);
+
+
+
+        page.assets.on("progress", function (evt) {
+            innerBar.scaleX = page.assets.progress;
+        });
+
+        page.assets.on("complete", function (evt) {
+            page.game.showPage(page.createContent(page.game, page.assets));
+        });
+    }
+
+    var loadScreenProgo = createjs.extend(LoadingScreen, createjs.Container);
+
+    window.LoadingScreen = createjs.promote(LoadingScreen, "Container");
+
+
+    function Page(game, manifest) {
+        this.game = game;
+        this.manifest = manifest;
+        this.content = null;
+        this.assets = new createjs.LoadQueue(false);
+        this.assets.installPlugin(createjs.Sound);
+    }
+
+    Page.prototype.start = function () {
+
+        if (this.manifest && this.manifest.length > 0) {
+            this.assets.loadManifest(this.manifest);
+            this.game.showPage(new LoadingScreen(this));
+        }
+        else {
+
+            this.game.showPage(this.createContent(this.game));
+        }
+    };
+
+    Page.prototype.createContent = function () {
+        this.content = null;
+
+        return this.content;
+    };
 
     return BeerSlut;
 })(createjs);
