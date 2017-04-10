@@ -2,6 +2,22 @@
 
 BeerSlut = (function (createjs) {
 
+    var cardData = [
+        { label: "Drink 3" },
+        { label: "Beer Slut: Get Beer" },
+        { label: "Distribute 3" },
+        { label: "Match Game" },
+        { label: "Person to the Right Drinks" },
+        { label: "Rules" },
+        { label: "Women Drink" },
+
+        { label: "Bomb: Drink 5" },
+        { label: "Person to the Left Drinks" },
+        { label: "Beer Knight: Maze Game" },
+        { label: "Men Drink" },
+        { label: "Subjects Game" },
+        { label: "Social" }
+    ];
 
     var fadeTime = 250;
 
@@ -256,24 +272,7 @@ BeerSlut = (function (createjs) {
         container.addChild(bg, ins1, ins2);
 
         var cardsPerRow = 7;
-
-        var cards = [
-            { label: "Drink 3" },
-            { label: "Beer SLut: Get Beer" },
-            { label: "Distribute 3" },
-            { label: "Match Game" },
-            { label: "Person to the Right Drinks" },
-            { label: "Rules" },
-            { label: "Women Drink" },
-
-            { label: "Bomb: Drink 5" },
-            { label: "Person to the Left Drinks" },
-            { label: "Beer Knight: Maze Game" },
-            { label: "Men Drink" },
-            { label: "Subjects Game" },
-            { label: "Social" }
-        ];
-
+        
         var cardWidth = bs.getWidthPercent(75 / cardsPerRow);
         var cardHeight = bs.getHeightPercent(15);
 
@@ -286,7 +285,7 @@ BeerSlut = (function (createjs) {
         textOptions.y = cardHeight;
         textOptions.font = "35px Comic Sans MS";
 
-        for (var i = 0; i < cards.length; ++i) {
+        for (var i = 0; i < cardData.length; ++i) {
             var card = new createjs.Container();
             card.x = ins1.x + (i % cardsPerRow) * (cardWidth + cardMarginX);
             card.y = bs.getHeightPercent(30) + (Math.floor(i / cardsPerRow) * (cardHeight + 200));
@@ -296,7 +295,7 @@ BeerSlut = (function (createjs) {
 
             var shape = createCardShape(cardWidth, cardHeight);
 
-            var caption = new createjs.Text(cards[i].label).set(textOptions);
+            var caption = new createjs.Text(cardData[i].label).set(textOptions);
 
             card.addChild(shape, caption);
 
