@@ -202,9 +202,9 @@ BeerSlut = (function (createjs) {
 
         var wench = new createjs.Bitmap(assets.getResult("wench"))
             .set({
-                x: bs.getWidthPercent(30),
-                y: bs.getHeightPercent(100),
-                alpha: 0,
+                x: bs.getWidthPercent(-10),
+                y: bs.getHeightPercent(110),
+                alpha: 1,
                 regX: 165,
                 regY: 482
             });
@@ -228,8 +228,34 @@ BeerSlut = (function (createjs) {
             .to({ alpha: 0.75 }, fadeTime * 2);
 
         createjs.Tween.get(wench)
-            .wait(7200)
-            .to({ alpha: 1 }, fadeTime * 4);
+            //.wait(7200)
+            .to({ x: bs.getWidthPercent(20) }, 1000, createjs.Ease.sineInOut)
+            .wait(400)
+            .to({ x: bs.getWidthPercent(40) }, 1000, createjs.Ease.sineInOut)
+            .wait(400)
+            .to({ x: bs.getWidthPercent(60) }, 1000, createjs.Ease.sineInOut)
+            .wait(400)
+            .to({ x: bs.getWidthPercent(80) }, 1000, createjs.Ease.sineInOut)
+            .wait(600)
+            .to({ x: bs.getWidthPercent(30) }, 1000, createjs.Ease.sineInOut)
+            ;
+
+        createjs.Tween.get(wench)
+            //.wait(7200)
+            .to({ y: bs.getHeightPercent(100) }, 1000, createjs.Ease.sineInOut)
+            .wait(400)
+            .to({ y: bs.getHeightPercent(105) }, 500, createjs.Ease.sineInOut)
+            .to({ y: bs.getHeightPercent(100) }, 500, createjs.Ease.sineInOut)
+            .wait(400)
+            .to({ y: bs.getHeightPercent(105) }, 500, createjs.Ease.sineInOut)
+            .to({ y: bs.getHeightPercent(100) }, 500, createjs.Ease.sineInOut)
+            .wait(400)
+            .to({ y: bs.getHeightPercent(105) }, 500, createjs.Ease.sineInOut)
+            .to({ y: bs.getHeightPercent(100) }, 500, createjs.Ease.sineInOut)
+            .wait(600)
+            .to({ y: bs.getHeightPercent(105) }, 500, createjs.Ease.sineInOut)
+            .to({ y: bs.getHeightPercent(100), scaleX: 1.25, scaleY: 1.25 }, 500, createjs.Ease.sineInOut)
+            ;
 
         createjs.Tween.get(bs4)
             .wait(3500)
